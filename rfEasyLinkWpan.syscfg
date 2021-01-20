@@ -1,0 +1,78 @@
+/**
+ * These arguments were used when this file was generated. They will be automatically applied on subsequent loads
+ * via the GUI or CLI. Run CLI with '--help' for additional information on how to override these arguments.
+ * @cliArgs --board "/ti/boards/CC1352P_2_LAUNCHXL" --product "simplelink_cc13x2_26x2_sdk@4.30.00.54"
+ * @versions {"data":"2020090214","timestamp":"2020090214","tool":"1.6.0+1543","templates":"2020090214"}
+ */
+
+/**
+ * Import the modules used in this configuration.
+ */
+const rfdesign = scripting.addModule("/ti/devices/radioconfig/rfdesign");
+const GPIO     = scripting.addModule("/ti/drivers/GPIO");
+const GPIO1    = GPIO.addInstance();
+const RF       = scripting.addModule("/ti/drivers/RF");
+const RTOS     = scripting.addModule("/ti/drivers/RTOS");
+const UART2    = scripting.addModule("/ti/drivers/UART2");
+const UART21   = UART2.addInstance();
+const UART22   = UART2.addInstance();
+const easylink = scripting.addModule("/ti/easylink/easylink");
+
+/**
+ * Write custom configuration values to the imported modules.
+ */
+rfdesign.rfDesign = "LAUNCHXL-CC1352P-2";
+rfdesign.pa20     = "fbSub1g";
+
+GPIO1.$hardware         = system.deviceData.board.components.LED_RED;
+GPIO1.$name             = "CONFIG_GPIO_LED_0";
+GPIO1.pinInstance.$name = "CONFIG_PIN_0";
+
+const CCFG              = scripting.addModule("/ti/devices/CCFG", {}, false);
+CCFG.ccfgTemplate.$name = "ti_devices_CCFGTemplate0";
+
+RF.globalCallbackFunction = "rfDriverCallback";
+RF.globalEventMask        = ["RF_GlobalEventCmdStart","RF_GlobalEventCmdStop","RF_GlobalEventCoexControl","RF_GlobalEventInit","RF_GlobalEventRadioPowerDown","RF_GlobalEventRadioSetup"];
+RF.$hardware              = system.deviceData.board.components["SKY13317-373LF"];
+
+UART21.$name               = "CONFIG_UART2_0";
+UART21.$hardware           = system.deviceData.board.components.XDS110UART;
+UART21.txPinInstance.$name = "CONFIG_PIN_1";
+UART21.rxPinInstance.$name = "CONFIG_PIN_2";
+
+UART22.$name               = "CONFIG_UART2_1";
+UART22.uart.txPin.$assign  = "boosterpack.9";
+UART22.uart.rxPin.$assign  = "boosterpack.5";
+UART22.txPinInstance.$name = "CONFIG_PIN_3";
+UART22.rxPinInstance.$name = "CONFIG_PIN_4";
+
+easylink.EasyLink_Phy_50kbps2gfsk                                    = true;
+easylink.EasyLink_Phy_200kbps2gfsk                                   = true;
+easylink.EasyLink_Phy_5kbpsSlLr                                      = true;
+easylink.EasyLink_Phy_2_4_100kbps2gfsk                               = true;
+easylink.EasyLink_Phy_2_4_250kbps2gfsk                               = true;
+easylink.rfDesign                                                    = "LAUNCHXL-CC1352P-2";
+easylink.radioConfigEasylinkPhy24100kbps2gfsk.codeExportConfig.$name = "ti_devices_radioconfig_code_export_param4";
+easylink.radioConfigEasylinkPhy24250kbps2gfsk.codeExportConfig.$name = "ti_devices_radioconfig_code_export_param5";
+easylink.radioConfigEasylinkPhyCustom.txPower                        = "12.5";
+easylink.radioConfigEasylinkPhyCustom.codeExportConfig.$name         = "ti_devices_radioconfig_code_export_param0";
+easylink.radioConfigEasylinkPhy50kbps2gfsk.txPower                   = "12.5";
+easylink.radioConfigEasylinkPhy50kbps2gfsk.codeExportConfig.$name    = "ti_devices_radioconfig_code_export_param1";
+easylink.radioConfigEasylinkPhy5kbpssllr.txPower                     = "12.5";
+easylink.radioConfigEasylinkPhy5kbpssllr.codeExportConfig.$name      = "ti_devices_radioconfig_code_export_param2";
+easylink.radioConfigEasylinkPhy200kbps2gfsk.txPower                  = "12.5";
+easylink.radioConfigEasylinkPhy200kbps2gfsk.codeExportConfig.$name   = "ti_devices_radioconfig_code_export_param3";
+
+/**
+ * Pinmux solution for unlocked pins/peripherals. This ensures that minor changes to the automatic solver in a future
+ * version of the tool will not impact the pinmux you originally saw.  These lines can be completely deleted in order to
+ * re-solve from scratch.
+ */
+GPIO1.gpioPin.$suggestSolution     = "boosterpack.39";
+RF.rfAntennaPin0.$suggestSolution  = "DIO_28";
+RF.rfAntennaPin1.$suggestSolution  = "DIO_29";
+RF.rfAntennaPin2.$suggestSolution  = "DIO_30";
+UART21.uart.$suggestSolution       = "UART1";
+UART21.uart.txPin.$suggestSolution = "boosterpack.4";
+UART21.uart.rxPin.$suggestSolution = "boosterpack.3";
+UART22.uart.$suggestSolution       = "UART0";
