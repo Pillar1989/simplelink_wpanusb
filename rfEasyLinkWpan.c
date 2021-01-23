@@ -45,7 +45,7 @@
 #include <ti/drivers/UART2.h>
 /* Driver configuration */
 #include "ti_drivers_config.h"
-#include "wpanusb.h"
+#include "wpanusb/wpanusb.h"
 
 static sem_t sem;
 static volatile size_t numBytesRead;
