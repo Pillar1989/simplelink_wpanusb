@@ -69,11 +69,14 @@ void callbackFxn1(UART2_Handle handle, void *buffer, size_t count,
     numBytesRead = count;
     sem_post(&sem);
 }
+
+
 void *uartThread(void *arg0){
     UART2_Params      uart0Params;
     UART2_Params      uart1Params;
     uint32_t          status = UART2_STATUS_SUCCESS;
     int32_t           semStatus;
+
     /* Create semaphore */
     semStatus = sem_init(&sem, 0, 0);
 
@@ -104,6 +107,7 @@ void *uartThread(void *arg0){
         /* UART_open() failed */
         while (1);
     }
+
     while(1){
         numBytesRead = 0;
 
@@ -113,9 +117,9 @@ void *uartThread(void *arg0){
             /* UART2_read() failed */
             while (1);
         }
+        RingBuf_putn(&wpan_context_data.rx_ringbuf, wpan_context_data.buf,numBytesRead);
         /* Do not write until read callback executes */
         sem_wait(&sem);
-        RingBuf_putn(&wpan_context_data.rx_ringbuf, wpan_context_data.buf,numBytesRead);
     }
 }
 /*
@@ -145,6 +149,10 @@ void *mainThread(void *arg0)
         while (1) {}
     }
 
+    if(wpanusb_init(&wpan_context_data)){
+    	while(1);
+    }
+
     retc = pthread_create(&thread, &attrs, uartThread, NULL);
     if (retc != 0) {
         /* pthread_create() failed */
@@ -161,9 +169,6 @@ void *mainThread(void *arg0)
     /* Turn on user LED to indicate successful initialization */
     GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
-    if(wpanusb_init(&wpan_context_data)){
-    	while(1);
-    }
     /* Loop forever echoing */
     while (1) {
         wpanusb_loop(&wpan_context_data);
