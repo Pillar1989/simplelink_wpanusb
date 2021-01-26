@@ -169,7 +169,6 @@ void *mainThread(void *arg0)
     /* Turn on user LED to indicate successful initialization */
     GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
 
-    /* Loop forever echoing */
     while (1) {
         wpanusb_loop(&wpan_context_data);
     }
