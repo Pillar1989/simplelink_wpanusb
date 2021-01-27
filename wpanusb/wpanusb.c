@@ -8,11 +8,20 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/drivers/UART2.h>
-#include "stdarg.h"
+#include <ti/drivers/GPIO.h>
+#include <semaphore.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
+/* For usleep() */
+#include <unistd.h>
+#include "ti_drivers_config.h"
 extern UART2_Handle 	 uart1_handle;
 extern UART2_Handle      uart0_handle;
+static sem_t tx_sem;
+// Handle for the Callback Event Queue
+
 
 void wpanusb_printf(const char *fmt, ...) // custom printf() function
 {
@@ -51,6 +60,131 @@ uint16_t crc16_ccitt(uint16_t seed, const uint8_t *src, size_t len)
 	}
 
 	return seed;
+}
+
+static void uart_poll_out(uint8_t byte){
+	uint32_t          status = UART2_STATUS_SUCCESS;
+	status = UART2_write(uart0_handle, &byte, 1, NULL);
+	if (status != UART2_STATUS_SUCCESS) {
+		/* UART2_write() failed */
+		while (1);
+	}
+}
+
+static void uart_poll_out_crc(uint8_t byte, uint16_t *crc)
+{
+	*crc = crc16_ccitt(*crc, &byte, 1);
+	if(byte == HDLC_FRAME || byte == HDLC_ESC) {
+		uart_poll_out( HDLC_ESC);
+		byte ^= 0x20;
+	}
+	uart_poll_out(byte);
+}
+
+static void block_out(struct wpan_driver_context *wpan, struct hdlc_block *block_ptr)
+{
+	uint16_t crc = 0xffff;
+
+	uart_poll_out(HDLC_FRAME);
+	uart_poll_out_crc(block_ptr->address, &crc);
+
+	if (block_ptr->ctrl == 0) {
+		uart_poll_out_crc(wpan->hdlc_send_seq << 1, &crc);
+	} else {
+		uart_poll_out_crc(block_ptr->ctrl, &crc);
+	}
+
+	for(int i=0; i<block_ptr->length; i++) {
+		uart_poll_out_crc(block_ptr->buffer[i], &crc);
+	}
+
+	uint16_t crc_calc = crc ^ 0xffff;
+	uart_poll_out_crc(crc_calc, &crc);
+	uart_poll_out_crc(crc_calc >> 8, &crc);
+	uart_poll_out(HDLC_FRAME);
+}
+
+static void init_hdlc(struct wpan_driver_context *wpan)
+{
+	struct hdlc_block block;
+	struct timespec		ts;
+	block.address = ADDRESS_HW;
+	block.length = 0;
+	block.ctrl = 0;
+	ts.tv_nsec = 100*1000;
+
+	while(1) {
+		block_out(wpan, &block);
+		if (sem_timedwait(&tx_sem, &ts)) {
+			//pulse the BOOT line
+			GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_OFF);
+			usleep(100*100);
+			GPIO_write(CONFIG_GPIO_LED_0, CONFIG_GPIO_LED_ON);
+			usleep(500*100);
+//			LOG_ERR("RETRY HDLC INIT");
+		} else {
+			LOG_DBG("HDLC Ready");
+			wpan->hdlc_rx_send_seq = 1;
+			return;
+		}
+	}
+}
+
+void *txUartThread(void *arg0){
+	struct wpan_driver_context *wpan = arg0;
+	struct hdlc_block *block_ptr;
+	struct timespec		ts;
+    int32_t           semStatus;
+
+    /* Create semaphore */
+    semStatus = sem_init(&tx_sem, 0, 0);
+    // Create a Tx Queue instance
+    wpan->tx_queue = Queue_create(NULL, NULL);
+    if (semStatus != 0) {
+        /* Error creating semaphore */
+        while (1);
+    }
+	init_hdlc(wpan);
+
+	while(1) {
+		if (!Queue_empty(wpan->tx_queue)){
+			block_ptr = Queue_get(wpan->tx_queue);
+			if (!block_ptr) {
+				LOG_ERR("FIFO Get Error");
+				continue;
+			}
+
+			uint8_t block_pending = 0;
+			int retries = 0;
+			int wait_time = 15;
+			do {
+				block_out(wpan, block_ptr);
+
+				if (block_ptr->ctrl == 0) {
+					ts.tv_nsec = wait_time*1000;
+					if (sem_timedwait(&tx_sem, &ts)) {
+						if (retries++ < 3) {
+							LOG_DBG("I-Frame Retry");
+							wait_time += 5;
+							block_pending = 1;
+						} else if (wpan->hdlc_rx_send_seq == ((wpan->hdlc_send_seq + 1) & 0x07)) {
+							LOG_DBG("I-Frame Seq Retry");
+							wait_time += 5;
+							block_pending = 1;
+						} else {
+							LOG_ERR("No ACK, Drop Packet");
+							block_pending = 0;
+						}
+					} else {
+						wpan->hdlc_rx_send_seq = (wpan->hdlc_rx_send_seq + 1) & 0x07;
+						block_pending = 0;
+					}
+				}
+			} while (block_pending);
+			free(block_ptr);
+		}else
+			Task_sleep(10000 / Clock_tickPeriod);
+	}
 }
 
 uint8_t wpanusb_init(struct wpan_driver_context *driver){
@@ -111,9 +245,6 @@ static void wpan_process_ctrl_frame(struct wpan_driver_context *wpan)
 	}
 }
 
-
-
-
 static void wpan_process_frame(struct wpan_driver_context *wpan)
 {
 	if(wpan->rx_buffer[0] == 0xEE) {
@@ -126,7 +257,7 @@ static void wpan_process_frame(struct wpan_driver_context *wpan)
 
 		if ((ctrl & 1) == 0) {
 			wpan->hdlc_rx_send_seq = (ctrl >> 5) & 0x07;
-			//k_sem_give(&hdlc_sem);
+			sem_post(&tx_sem);
 		} else if (address == ADDRESS_CTRL && wpan->rx_buffer_len > 9) {
 			wpan_process_ctrl_frame(wpan);
 		} else if (address == ADDRESS_CDC) {
@@ -178,9 +309,9 @@ static void wpan_input_byte(struct wpan_driver_context *wpan, uint8_t byte)
 
 static int wpan_consume_ringbuf(struct wpan_driver_context *wpan)
 {
+	//to do, 100 ?
 	uint8_t data[100];
 	size_t len, tmp;
-	int ret;
 
 	len = RingBuf_getn(&wpan->rx_ringbuf, data,
 				 CONFIG_WPANUSB_RINGBUF_SIZE);
@@ -193,31 +324,20 @@ static int wpan_consume_ringbuf(struct wpan_driver_context *wpan)
 		wpan_input_byte(wpan, data[len - tmp]);
 	} while (--tmp);
 
-//	ret = ring_buf_get_finish(&wpan->rx_ringbuf, len);
-//	if (ret < 0) {
-//		LOG_ERR("Cannot flush ring buffer (%d)", ret);
-//	}
 	return -EAGAIN;
 }
 
 void wpanusb_loop(struct wpan_driver_context *wpan){
+//	uint8_t data;
+//	uint32_t          status = UART2_STATUS_SUCCESS;
 	if(RingBuf_getCount(&wpan->rx_ringbuf) > 1){
 		wpan_consume_ringbuf(wpan);
-
+//		RingBuf_get(&wpan->rx_ringbuf, &data);
 //		status = UART2_write(uart1_handle, &data, 1, NULL);
 //		if (status != UART2_STATUS_SUCCESS) {
 //			/* UART2_write() failed */
 //			while (1);
 //		}
-
-//		data = 1;
-//		status = UART2_write(uart0_handle, &data, 1, NULL);
-//		if (status != UART2_STATUS_SUCCESS) {
-//			/* UART2_write() failed */
-//			while (1);
-//		}
-
-
     }else
     	Task_sleep(10000 / Clock_tickPeriod);
 }

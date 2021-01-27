@@ -8,6 +8,7 @@
 #ifndef WPANUSB_H_
 #define WPANUSB_H_
 #include <ti/drivers/utils/RingBuf.h>
+#include <ti/sysbios/knl/Queue.h>
 
 #define CONFIG_WPANUSB_UART_BUF_LEN 8
 #define CONFIG_WPANUSB_RINGBUF_SIZE 1024
@@ -24,7 +25,7 @@
 #define HDLC_ESC_FRAME  0x5E
 #define HDLC_ESC_ESC    0x5D
 
-#define HDLC_BUFFER_SIZE 140
+#define HDLC_BUFFER_SIZE 256
 
 
 enum wpanusb_requests {
@@ -94,11 +95,14 @@ struct wpan_driver_context {
 
 	uint8_t hdlc_send_seq;
 	uint8_t hdlc_rx_send_seq;
+
+	Queue_Handle tx_queue;
 };
 
 
 uint8_t wpanusb_init(struct wpan_driver_context *driver);
 void wpanusb_loop(struct wpan_driver_context *driver);
+void *txUartThread(void *arg0);
 
 #define	EPERM		 1	/* Operation not permitted */
 #define	ENOENT		 2	/* No such file or directory */

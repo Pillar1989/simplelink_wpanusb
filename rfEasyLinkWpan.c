@@ -47,7 +47,7 @@
 #include "ti_drivers_config.h"
 #include "wpanusb/wpanusb.h"
 
-static sem_t sem;
+static sem_t rx_sem;
 static volatile size_t numBytesRead;
 static struct wpan_driver_context wpan_context_data;
 UART2_Handle     uart0_handle;
@@ -67,18 +67,18 @@ void callbackFxn1(UART2_Handle handle, void *buffer, size_t count,
         while (1);
     }
     numBytesRead = count;
-    sem_post(&sem);
+    sem_post(&rx_sem);
 }
 
 
-void *uartThread(void *arg0){
+void *rxUartThread(void *arg0){
     UART2_Params      uart0Params;
     UART2_Params      uart1Params;
     uint32_t          status = UART2_STATUS_SUCCESS;
     int32_t           semStatus;
 
     /* Create semaphore */
-    semStatus = sem_init(&sem, 0, 0);
+    semStatus = sem_init(&rx_sem, 0, 0);
 
     if (semStatus != 0) {
         /* Error creating semaphore */
@@ -118,10 +118,12 @@ void *uartThread(void *arg0){
             while (1);
         }
         /* Do not write until read callback executes */
-        sem_wait(&sem);
+        sem_wait(&rx_sem);
         RingBuf_putn(&wpan_context_data.rx_ringbuf, wpan_context_data.buf,numBytesRead);
     }
 }
+
+
 /*
  *  ======== mainThread ========
  */
@@ -143,7 +145,7 @@ void *mainThread(void *arg0)
     priParam.sched_priority = 2;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, 1024);
+    retc |= pthread_attr_setstacksize(&attrs, 4096);
     if (retc != 0) {
         /* failed to set attributes */
         while (1) {}
@@ -153,7 +155,19 @@ void *mainThread(void *arg0)
     	while(1);
     }
 
-    retc = pthread_create(&thread, &attrs, uartThread, NULL);
+    retc = pthread_create(&thread, &attrs, rxUartThread, NULL);
+    if (retc != 0) {
+        /* pthread_create() failed */
+        while (1) {}
+    }
+
+    priParam.sched_priority = 3;
+    retc = pthread_attr_setschedparam(&attrs, &priParam);
+    if (retc != 0) {
+        /* failed to set priority */
+        while (1) {}
+    }
+    retc = pthread_create(&thread, &attrs, txUartThread, &wpan_context_data);
     if (retc != 0) {
         /* pthread_create() failed */
         while (1) {}
