@@ -1,2 +1,8 @@
-Debug
 .settings/
+*.o
+*.d
+*.hex
+*.map
+*.out
+Debug/syscfg
+/Debug/
