@@ -117,9 +117,9 @@ void *uartThread(void *arg0){
             /* UART2_read() failed */
             while (1);
         }
-        RingBuf_putn(&wpan_context_data.rx_ringbuf, wpan_context_data.buf,numBytesRead);
         /* Do not write until read callback executes */
         sem_wait(&sem);
+        RingBuf_putn(&wpan_context_data.rx_ringbuf, wpan_context_data.buf,numBytesRead);
     }
 }
 /*
