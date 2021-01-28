@@ -145,7 +145,7 @@ void *mainThread(void *arg0)
     priParam.sched_priority = 2;
     retc = pthread_attr_setschedparam(&attrs, &priParam);
     retc |= pthread_attr_setdetachstate(&attrs, PTHREAD_CREATE_DETACHED);
-    retc |= pthread_attr_setstacksize(&attrs, 4096);
+    retc |= pthread_attr_setstacksize(&attrs, 1024);
     if (retc != 0) {
         /* failed to set attributes */
         while (1) {}

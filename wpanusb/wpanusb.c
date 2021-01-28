@@ -4,7 +4,6 @@
  *  Created on: Jan 15, 2021
  *      Author: baozhu
  */
-#include "wpanusb.h"
 #include <ti/sysbios/knl/Clock.h>
 #include <ti/sysbios/knl/Task.h>
 #include <ti/drivers/UART2.h>
@@ -17,6 +16,8 @@
 /* For usleep() */
 #include <unistd.h>
 #include "ti_drivers_config.h"
+#include "wpanusb.h"
+#include "ieee802154_radio.h"
 extern UART2_Handle 	 uart1_handle;
 extern UART2_Handle      uart0_handle;
 static sem_t tx_sem;

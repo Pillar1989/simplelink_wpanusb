@@ -15,6 +15,7 @@ ORDERED_OBJS += \
 "./syscfg/ti_radio_config.o" \
 "./syscfg/ti_drivers_config.o" \
 "./easylink/EasyLink.o" \
+"./wpanusb/ieee802154_radio.o" \
 "./wpanusb/wpanusb.o" \
 -Wl,-T"../cc13x2_cc26x2_tirtos.lds" \
 -l:ti_utils_build_linker.cmd.genlibs \
@@ -171,8 +172,8 @@ rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.hex: $(EXE_OUTPUTS)
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main_tirtos.o" "rfEasyLinkWpan.o" "syscfg/ti_easylink_config.o" "syscfg/ti_devices_config.o" "syscfg/ti_radio_config.o" "syscfg/ti_drivers_config.o" "easylink/EasyLink.o" "wpanusb/wpanusb.o" 
-	-$(RM) "main_tirtos.d" "rfEasyLinkWpan.d" "syscfg/ti_easylink_config.d" "syscfg/ti_devices_config.d" "syscfg/ti_radio_config.d" "syscfg/ti_drivers_config.d" "easylink/EasyLink.d" "wpanusb/wpanusb.d" 
+	-$(RM) "main_tirtos.o" "rfEasyLinkWpan.o" "syscfg/ti_easylink_config.o" "syscfg/ti_devices_config.o" "syscfg/ti_radio_config.o" "syscfg/ti_drivers_config.o" "easylink/EasyLink.o" "wpanusb/ieee802154_radio.o" "wpanusb/wpanusb.o" 
+	-$(RM) "main_tirtos.d" "rfEasyLinkWpan.d" "syscfg/ti_easylink_config.d" "syscfg/ti_devices_config.d" "syscfg/ti_radio_config.d" "syscfg/ti_drivers_config.d" "easylink/EasyLink.d" "wpanusb/ieee802154_radio.d" "wpanusb/wpanusb.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '
