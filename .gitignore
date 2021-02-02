@@ -4,5 +4,4 @@
 *.hex
 *.map
 *.out
-Debug/syscfg
-/Debug/
+*.genlibs

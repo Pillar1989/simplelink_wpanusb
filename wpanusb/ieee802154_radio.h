@@ -16,7 +16,6 @@ extern "C" {
 #include <stdint.h>
 #include <ti/drivers/rf/RF.h>
 #include <stdlib.h>
-#include "ti_easylink_config.h"
 #include "ti_drivers_config.h"
 #include "ti_radio_config.h"
 

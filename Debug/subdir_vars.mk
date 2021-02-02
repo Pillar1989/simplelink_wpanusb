@@ -12,13 +12,11 @@ LDS_SRCS += \
 C_SRCS += \
 ../main_tirtos.c \
 ../rfEasyLinkWpan.c \
-./syscfg/ti_easylink_config.c \
 ./syscfg/ti_devices_config.c \
 ./syscfg/ti_radio_config.c \
 ./syscfg/ti_drivers_config.c 
 
 GEN_FILES += \
-./syscfg/ti_easylink_config.c \
 ./syscfg/ti_devices_config.c \
 ./syscfg/ti_radio_config.c \
 ./syscfg/ti_drivers_config.c 
@@ -29,7 +27,6 @@ GEN_MISC_DIRS += \
 C_DEPS += \
 ./main_tirtos.d \
 ./rfEasyLinkWpan.d \
-./syscfg/ti_easylink_config.d \
 ./syscfg/ti_devices_config.d \
 ./syscfg/ti_radio_config.d \
 ./syscfg/ti_drivers_config.d 
@@ -37,13 +34,11 @@ C_DEPS += \
 OBJS += \
 ./main_tirtos.o \
 ./rfEasyLinkWpan.o \
-./syscfg/ti_easylink_config.o \
 ./syscfg/ti_devices_config.o \
 ./syscfg/ti_radio_config.o \
 ./syscfg/ti_drivers_config.o 
 
 GEN_MISC_FILES += \
-./syscfg/ti_easylink_config.h \
 ./syscfg/ti_radio_config.h \
 ./syscfg/ti_drivers_config.h \
 ./syscfg/ti_utils_build_linker.cmd.genlibs \
@@ -57,13 +52,11 @@ GEN_MISC_DIRS__QUOTED += \
 OBJS__QUOTED += \
 "main_tirtos.o" \
 "rfEasyLinkWpan.o" \
-"syscfg/ti_easylink_config.o" \
 "syscfg/ti_devices_config.o" \
 "syscfg/ti_radio_config.o" \
 "syscfg/ti_drivers_config.o" 
 
 GEN_MISC_FILES__QUOTED += \
-"syscfg/ti_easylink_config.h" \
 "syscfg/ti_radio_config.h" \
 "syscfg/ti_drivers_config.h" \
 "syscfg/ti_utils_build_linker.cmd.genlibs" \
@@ -74,13 +67,11 @@ GEN_MISC_FILES__QUOTED += \
 C_DEPS__QUOTED += \
 "main_tirtos.d" \
 "rfEasyLinkWpan.d" \
-"syscfg/ti_easylink_config.d" \
 "syscfg/ti_devices_config.d" \
 "syscfg/ti_radio_config.d" \
 "syscfg/ti_drivers_config.d" 
 
 GEN_FILES__QUOTED += \
-"syscfg/ti_easylink_config.c" \
 "syscfg/ti_devices_config.c" \
 "syscfg/ti_radio_config.c" \
 "syscfg/ti_drivers_config.c" 
@@ -88,7 +79,6 @@ GEN_FILES__QUOTED += \
 C_SRCS__QUOTED += \
 "../main_tirtos.c" \
 "../rfEasyLinkWpan.c" \
-"./syscfg/ti_easylink_config.c" \
 "./syscfg/ti_devices_config.c" \
 "./syscfg/ti_radio_config.c" \
 "./syscfg/ti_drivers_config.c" 

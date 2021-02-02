@@ -2,7 +2,7 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-CG_TOOL_ROOT := /opt/ti/ccs1011/ccs/tools/compiler/gcc-arm-none-eabi-9-2019-q4-major
+CG_TOOL_ROOT := /home/baozhu/ti/gcc_arm_none_eabi_9_2_1
 
 GEN_OPTS__FLAG := @"/home/baozhu/ti/workspace_v11/tirtos_builds_cc13x2_cc26x2_release_gcc/Debug/configPkg/compiler.opt" 
 GEN_CMDS__FLAG := -Wl,-T"/home/baozhu/ti/workspace_v11/tirtos_builds_cc13x2_cc26x2_release_gcc/Debug/configPkg/linker.cmd" 
@@ -10,11 +10,9 @@ GEN_CMDS__FLAG := -Wl,-T"/home/baozhu/ti/workspace_v11/tirtos_builds_cc13x2_cc26
 ORDERED_OBJS += \
 "./main_tirtos.o" \
 "./rfEasyLinkWpan.o" \
-"./syscfg/ti_easylink_config.o" \
 "./syscfg/ti_devices_config.o" \
 "./syscfg/ti_radio_config.o" \
 "./syscfg/ti_drivers_config.o" \
-"./easylink/EasyLink.o" \
 "./wpanusb/ieee802154_radio.o" \
 "./wpanusb/wpanusb.o" \
 -Wl,-T"../cc13x2_cc26x2_tirtos.lds" \
@@ -34,10 +32,8 @@ RMDIR := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include subdir_vars.mk
--include easylink/subdir_vars.mk
 -include wpanusb/subdir_vars.mk
 -include subdir_rules.mk
--include easylink/subdir_rules.mk
 -include wpanusb/subdir_rules.mk
 -include objects.mk
 
@@ -158,22 +154,22 @@ dependents:
 rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.out: $(OBJS) $(LDS_SRCS) $(GEN_CMDS) /home/baozhu/ti/workspace_v11/tirtos_builds_cc13x2_cc26x2_release_gcc/Debug/libtirtos_builds_cc13x2_cc26x2_release_gcc.a
 	@echo 'Building target: "$@"'
 	@echo 'Invoking: GNU Linker'
-	"/opt/ti/ccs1011/ccs/tools/compiler/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc-9.2.1" -mfpu=fpv4-sp-d16 -DDeviceFamily_CC13X2 -ffunction-sections -fdata-sections -g -gdwarf-3 -gstrict-dwarf -Wall -mcpu=cortex-m4 -Wl,-Map,"rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.map" -nostartfiles -static -Wl,--gc-sections -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_30_00_54/source" -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_30_00_54/kernel/tirtos/packages" -L"/home/baozhu/ti/workspace_v11/rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc/Debug/syscfg/" -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_30_00_54/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m/hard" -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 --specs=nano.specs -o"rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.out" $(ORDERED_OBJS)
+	"/home/baozhu/ti/gcc_arm_none_eabi_9_2_1/bin/arm-none-eabi-gcc-9.2.1" -mfpu=fpv4-sp-d16 -DDeviceFamily_CC13X2 -ffunction-sections -fdata-sections -g -gdwarf-3 -gstrict-dwarf -Wall -mcpu=cortex-m4 -Wl,-Map,"rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.map" -nostartfiles -static -Wl,--gc-sections -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_40_00_44/source" -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_40_00_44/kernel/tirtos/packages" -L"/home/baozhu/ti/workspace_v11/rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc/Debug/syscfg/" -L"/home/baozhu/ti/simplelink_cc13x2_26x2_sdk_4_40_00_44/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m/hard" -march=armv7e-m -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 --specs=nano.specs -o"rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.out" $(ORDERED_OBJS)
 	@echo 'Finished building target: "$@"'
 	@echo ' '
 
 rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.hex: $(EXE_OUTPUTS)
 	@echo 'Building files: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo 'Invoking: GNU Objcopy Utility'
-	"/opt/ti/ccs1011/ccs/tools/compiler/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-objcopy"  $(EXE_OUTPUTS__QUOTED) "rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.hex"
+	"/home/baozhu/ti/gcc_arm_none_eabi_9_2_1/bin/arm-none-eabi-objcopy"  $(EXE_OUTPUTS__QUOTED) "rfEasyLinkWpan_CC1352P_2_LAUNCHXL_tirtos_gcc.hex"
 	@echo 'Finished building: $(strip $(EXE_OUTPUTS__QUOTED))'
 	@echo ' '
 
 # Other Targets
 clean:
 	-$(RM) $(GEN_MISC_FILES__QUOTED)$(BIN_OUTPUTS__QUOTED)$(GEN_FILES__QUOTED)$(EXE_OUTPUTS__QUOTED)
-	-$(RM) "main_tirtos.o" "rfEasyLinkWpan.o" "syscfg/ti_easylink_config.o" "syscfg/ti_devices_config.o" "syscfg/ti_radio_config.o" "syscfg/ti_drivers_config.o" "easylink/EasyLink.o" "wpanusb/ieee802154_radio.o" "wpanusb/wpanusb.o" 
-	-$(RM) "main_tirtos.d" "rfEasyLinkWpan.d" "syscfg/ti_easylink_config.d" "syscfg/ti_devices_config.d" "syscfg/ti_radio_config.d" "syscfg/ti_drivers_config.d" "easylink/EasyLink.d" "wpanusb/ieee802154_radio.d" "wpanusb/wpanusb.d" 
+	-$(RM) "main_tirtos.o" "rfEasyLinkWpan.o" "syscfg/ti_devices_config.o" "syscfg/ti_radio_config.o" "syscfg/ti_drivers_config.o" "wpanusb/ieee802154_radio.o" "wpanusb/wpanusb.o" 
+	-$(RM) "main_tirtos.d" "rfEasyLinkWpan.d" "syscfg/ti_devices_config.d" "syscfg/ti_radio_config.d" "syscfg/ti_drivers_config.d" "wpanusb/ieee802154_radio.d" "wpanusb/wpanusb.d" 
 	-$(RMDIR) $(GEN_MISC_DIRS__QUOTED)
 	-@echo 'Finished clean'
 	-@echo ' '
